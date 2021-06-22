@@ -35,6 +35,7 @@ CREATE TABLE `bill_type_` (
 /*Data for the table `bill_type_` */
 
 insert  into `bill_type_`(`id_`,`name_`) values
+(0,'全部'),
 (1,'收入'),
 (2,'支出'),
 (3,'借入'),
