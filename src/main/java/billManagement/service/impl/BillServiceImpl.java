@@ -6,10 +6,12 @@ import billManagement.pojo.Bill;
 import billManagement.pojo.BillExample;
 import billManagement.pojo.BillType;
 import billManagement.req.BillQueryReq;
+import billManagement.req.BillSaveReq;
 import billManagement.resp.BillQueryResp;
 import billManagement.resp.PageResp;
 import billManagement.service.BillService;
 import billManagement.util.CopyUtil;
+import billManagement.util.SnowFlake;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
 import org.slf4j.Logger;
@@ -41,6 +43,9 @@ public class BillServiceImpl implements BillService {
 
     @Resource
     private BillTypeMapper billTypeMapper;
+
+    @Resource
+    private SnowFlake snowFlake;
 
     /**
      * 获取账单的信息
@@ -117,5 +122,58 @@ public class BillServiceImpl implements BillService {
         pageResp.setList(billQueryResps);
         pageResp.setTotal(pageInfo.getTotal());
         return pageResp;
+    }
+
+    /**
+     * 根据 id 进行查询
+     *
+     * @param id
+     * @return
+     */
+    @Override
+    public BillQueryResp selectById(Long id) {
+        Bill bill = billMapper.selectByPrimaryKey(id);
+        BillQueryResp copy = CopyUtil.copy(bill, BillQueryResp.class);
+        BillType billType = billTypeMapper.selectByPrimaryKey(copy.getTypeId());
+        copy.setBillTypeName(billType.getName());
+        copy.setBillTimeStr(sdf.format(copy.getBillTime()));
+        return copy;
+    }
+
+    /**
+     * 账单保存/插入
+     *
+     * @param req
+     */
+    @Override
+    public void save(BillSaveReq req) {
+        /**
+         * 主键为空，说明是新增
+         */
+        if (req.getId()==null) {
+            Bill bill = CopyUtil.copy(req, Bill.class);
+            Date billDate = null;
+            try {
+                billDate = sdf.parse(req.getBillTimeStr());
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            bill.setBillTime(billDate);
+            bill.setId(snowFlake.nextId());
+            billMapper.insert(bill);
+        } else {
+            /**
+             * 主键不为空，说明是更新
+             */
+            Bill bill = CopyUtil.copy(req, Bill.class);
+            Date billDate = null;
+            try {
+                billDate = sdf.parse(req.getBillTimeStr());
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+            bill.setBillTime(billDate);
+            billMapper.insertSelective(bill);
+        }
     }
 }

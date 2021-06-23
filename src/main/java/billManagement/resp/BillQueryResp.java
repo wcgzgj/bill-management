@@ -24,7 +24,7 @@ public class BillQueryResp {
 
     private Date billTime;
 
-    private String billTimeStr;
+    private String billTimeStr ;
 
 
     private Long typeId;

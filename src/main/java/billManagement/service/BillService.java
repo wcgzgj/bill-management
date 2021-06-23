@@ -1,6 +1,8 @@
 package billManagement.service;
 
 import billManagement.req.BillQueryReq;
+import billManagement.req.BillSaveReq;
+import billManagement.resp.BillQueryResp;
 import billManagement.resp.PageResp;
 
 public interface BillService {
@@ -12,4 +14,17 @@ public interface BillService {
      * @return
      */
     PageResp list(BillQueryReq req);
+
+    /**
+     * 根据 id 进行查询
+     * @param id
+     * @return
+     */
+    BillQueryResp selectById(Long id);
+
+    /**
+     * 账单保存/插入
+     * @param req
+     */
+    void save(BillSaveReq req);
 }
