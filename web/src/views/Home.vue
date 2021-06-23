@@ -77,7 +77,7 @@
               &nbsp;
               <span>
                 <!--使用 restful 风格的删除-->
-                <a-button type="danger" @click="deleteById(record)">删除</a-button>
+                <a-button type="danger" @click="deleteById(record.id)">删除</a-button>
               </span>
             </template>
           </a-table>
@@ -196,7 +196,16 @@ export default defineComponent({
      */
     const deleteById = (id) => {
       console.log("传入的账单id为:"+id);
-      axios.delete("/bill/delete/"+id)
+      axios.delete("/bill/delete/"+id).then(resp=> {
+        const data = resp.data;
+        if (data.success) {
+          message.success("删除成功");
+          getTypes();
+          onSearch();
+        } else {
+          message.error(data.message);
+        }
+      })
     }
 
 

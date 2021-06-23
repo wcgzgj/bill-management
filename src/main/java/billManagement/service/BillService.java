@@ -27,4 +27,11 @@ public interface BillService {
      * @param req
      */
     void save(BillSaveReq req);
+
+
+    /**
+     * 根据 id 删除账单信息
+     * @param id
+     */
+    void deleteById(Long id);
 }

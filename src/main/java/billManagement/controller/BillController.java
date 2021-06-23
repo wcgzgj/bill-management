@@ -72,4 +72,17 @@ public class BillController {
         return new CommonResp();
     }
 
+
+    /**
+     * 根据主键，删除id
+     * @param id
+     * @return
+     */
+    @DeleteMapping("/delete/{id}")
+    public CommonResp deleteById(@PathVariable("id")String id) {
+        long billId = Long.parseLong(id);
+        billService.deleteById(billId);
+        return new CommonResp();
+    }
+
 }

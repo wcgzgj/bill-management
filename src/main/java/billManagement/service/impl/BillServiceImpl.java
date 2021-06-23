@@ -176,4 +176,14 @@ public class BillServiceImpl implements BillService {
             billMapper.updateByPrimaryKeySelective(bill);
         }
     }
+
+    /**
+     * 根据 id 删除账单信息
+     *
+     * @param id
+     */
+    @Override
+    public void deleteById(Long id) {
+        billMapper.deleteByPrimaryKey(id);
+    }
 }
