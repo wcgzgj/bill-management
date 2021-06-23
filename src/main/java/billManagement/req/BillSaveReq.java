@@ -27,7 +27,7 @@ public class BillSaveReq {
     private Long id;
     private String title;
     private String billTimeStr;
-    private Float price;
+    private Double price;
     private String explain;
     private Long typeId;
 }

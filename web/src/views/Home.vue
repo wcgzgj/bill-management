@@ -66,8 +66,10 @@
             <template #action="{ record }">
               <span>
                 <!--使用 router-link 跳转，带上参数-->
-                <a-button type="primary" @click="toUpdate(record)">
-                  <router-link to="/update">
+                <a-button type="primary">
+                  <!--跳转到修改页面-->
+                  <!--传入账单信息-->
+                  <router-link :to="'/update?billId='+record.id">
                     修改
                   </router-link>
                 </a-button>

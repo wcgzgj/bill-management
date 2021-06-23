@@ -23,6 +23,7 @@
     import axios from 'axios';
     import {useRoute} from "vue-router";
     import router from '../router';
+    import {onMounted} from "@vue/runtime-core";
 
     export default defineComponent({
         name: 'template',

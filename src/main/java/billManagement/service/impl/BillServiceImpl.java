@@ -173,7 +173,7 @@ public class BillServiceImpl implements BillService {
                 e.printStackTrace();
             }
             bill.setBillTime(billDate);
-            billMapper.insertSelective(bill);
+            billMapper.updateByPrimaryKeySelective(bill);
         }
     }
 }
