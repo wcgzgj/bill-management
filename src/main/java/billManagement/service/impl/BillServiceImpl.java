@@ -1,7 +1,24 @@
 package billManagement.service.impl;
 
+import billManagement.mapper.BillMapper;
+import billManagement.mapper.BillTypeMapper;
+import billManagement.pojo.Bill;
+import billManagement.pojo.BillExample;
+import billManagement.pojo.BillType;
+import billManagement.req.BillQueryReq;
+import billManagement.resp.BillQueryResp;
+import billManagement.resp.PageResp;
 import billManagement.service.BillService;
+import billManagement.util.CopyUtil;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
 import org.springframework.stereotype.Service;
+
+import javax.annotation.Resource;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
 
 /**
  * @ClassName BillServiceImpl
@@ -12,4 +29,73 @@ import org.springframework.stereotype.Service;
  **/
 @Service
 public class BillServiceImpl implements BillService {
+
+    private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+
+    @Resource
+    private BillMapper billMapper;
+
+    @Resource
+    private BillTypeMapper billTypeMapper;
+
+    /**
+     * 获取账单的信息
+     * 查询条件包括分页参数和模糊查询
+     *
+     * @param req
+     * @return
+     */
+    @Override
+    public PageResp list(BillQueryReq req) {
+        String startDateStr = req.getStartDate();
+        String endDateStr = req.getEndDate();
+        startDateStr=startDateStr.substring(0,startDateStr.lastIndexOf("T"));
+        endDateStr=endDateStr.substring(0,endDateStr.lastIndexOf("T"));
+
+        Date startDate=null;
+        Date endDate=null;
+        try {
+            startDate = sdf.parse(startDateStr);
+            endDate = sdf.parse(endDateStr);
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        /**
+         * 条件查询
+         */
+        BillExample billExample = new BillExample();
+        BillExample.Criteria criteria = billExample.createCriteria();
+        if (startDate!=null) {
+            criteria.andBillTimeGreaterThanOrEqualTo(startDate);
+        }
+        if (endDate!=null) {
+            criteria.andBillTimeLessThanOrEqualTo(endDate);
+        }
+        criteria.andTypeIdEqualTo(req.getTypeId());
+
+        /**
+         * 分页查询
+         */
+        PageHelper.startPage(req.getPageNum(),req.getPageSize());
+        List<Bill> bills = billMapper.selectByExample(billExample);
+        PageInfo<Bill> pageInfo = new PageInfo<>(bills);
+
+        /**
+         * 将查询出的数据，封装为返回类型
+         */
+        List<BillQueryResp> billQueryResps = CopyUtil.copyList(bills, BillQueryResp.class);
+        /**
+         * 将返回类型中的 billType 查询出来
+         */
+        for (BillQueryResp billQueryResp : billQueryResps) {
+            BillType billType = billTypeMapper.selectByPrimaryKey(billQueryResp.getTypeId());
+            billQueryResp.setBillType(billType);
+        }
+
+        PageResp pageResp = new PageResp();
+        pageResp.setList(billQueryResps);
+        pageResp.setTotal(pageInfo.getTotal());
+        return pageResp;
+    }
 }

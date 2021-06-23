@@ -30,6 +30,11 @@ public class BillController {
     @GetMapping("/list")
     public CommonResp list(BillQueryReq req) {
         LOG.info("传入的查找参数为:{}",req);
+        LOG.info("传入的开始时间为:{}",req.getStartDate());
+        String startDate = req.getStartDate();
+        int t = startDate.lastIndexOf("T");
+        startDate=startDate.substring(0,t);
+        LOG.info("去除时间后的日期为:{}",startDate);
         // billService.list(req);
 
         return new CommonResp();
