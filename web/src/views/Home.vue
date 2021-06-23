@@ -161,7 +161,7 @@ export default defineComponent({
       title:"",
       startDate:"",
       endDate:"",
-      typeId:0,
+      typeId:'0',
       pageNum:1,
       pageSize:5
     });
