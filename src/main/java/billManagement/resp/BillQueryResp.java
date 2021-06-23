@@ -24,6 +24,9 @@ public class BillQueryResp {
 
     private Date billTime;
 
+    private String billTimeStr;
+
+
     private Long typeId;
 
     private Double price;
@@ -34,6 +37,6 @@ public class BillQueryResp {
      * 对一查询
      * 要查询出该 bill 的 billtype信息
      */
-    private BillType billType;
+    private String billTypeName;
 
 }

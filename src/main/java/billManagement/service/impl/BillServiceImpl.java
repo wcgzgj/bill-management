@@ -12,6 +12,8 @@ import billManagement.service.BillService;
 import billManagement.util.CopyUtil;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -32,6 +34,8 @@ public class BillServiceImpl implements BillService {
 
     private SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 
+    private static final Logger LOG= LoggerFactory.getLogger(BillServiceImpl.class);
+
     @Resource
     private BillMapper billMapper;
 
@@ -49,17 +53,30 @@ public class BillServiceImpl implements BillService {
     public PageResp list(BillQueryReq req) {
         String startDateStr = req.getStartDate();
         String endDateStr = req.getEndDate();
-        startDateStr=startDateStr.substring(0,startDateStr.lastIndexOf("T"));
-        endDateStr=endDateStr.substring(0,endDateStr.lastIndexOf("T"));
-
         Date startDate=null;
         Date endDate=null;
-        try {
-            startDate = sdf.parse(startDateStr);
-            endDate = sdf.parse(endDateStr);
-        } catch (ParseException e) {
-            e.printStackTrace();
+
+        if (startDateStr!=null && startDateStr.length()>0) {
+            startDateStr=startDateStr.substring(0,startDateStr.lastIndexOf("T"));
+            startDateStr=startDateStr.replaceAll("\"","");
+            LOG.info("裁剪后的时间信息为:{}",startDateStr);
+            try {
+                startDate = sdf.parse(startDateStr);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
         }
+
+        if (endDateStr!=null && endDateStr.length()>0) {
+            endDateStr=endDateStr.substring(0,endDateStr.lastIndexOf("T"));
+            endDateStr = endDateStr.replaceAll("\"","");
+            try {
+                endDate = sdf.parse(endDateStr);
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        }
+        
 
         /**
          * 条件查询
@@ -72,7 +89,9 @@ public class BillServiceImpl implements BillService {
         if (endDate!=null) {
             criteria.andBillTimeLessThanOrEqualTo(endDate);
         }
-        criteria.andTypeIdEqualTo(req.getTypeId());
+        if (req.getTypeId()!=0L) {
+            criteria.andTypeIdEqualTo(req.getTypeId());
+        }
 
         /**
          * 分页查询
@@ -90,7 +109,8 @@ public class BillServiceImpl implements BillService {
          */
         for (BillQueryResp billQueryResp : billQueryResps) {
             BillType billType = billTypeMapper.selectByPrimaryKey(billQueryResp.getTypeId());
-            billQueryResp.setBillType(billType);
+            billQueryResp.setBillTypeName(billType.getName());
+            billQueryResp.setBillTimeStr(sdf.format(billQueryResp.getBillTime()));
         }
 
         PageResp pageResp = new PageResp();

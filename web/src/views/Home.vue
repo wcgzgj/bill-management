@@ -42,7 +42,7 @@
           <a-button type="primary" :onclick="onSearch">查询</a-button>
           &nbsp;
           &nbsp;
-          <a-button type="primary">重置</a-button>
+          <a-button type="primary" :onclick="reset">重置</a-button>
           &nbsp;
           &nbsp;
           <a-button type="primary">
@@ -72,6 +72,7 @@
                   </router-link>
                 </a-button>
               </span>
+              &nbsp;
               <span>
                 <!--使用 restful 风格的删除-->
                 <a-button type="danger" @click="deleteById(record)">删除</a-button>
@@ -105,8 +106,8 @@ const columns = [
   },
   {
     title: '时间',
-    dataIndex: 'billTime',
-    key: 'billTime',
+    dataIndex: 'billTimeStr',
+    key: 'billTimeStr',
   },
   {
     title: '金额',
@@ -115,8 +116,8 @@ const columns = [
   },
   {
     title: '类别',
-    key: 'type',
-    dataIndex: 'type',
+    key: 'billTypeName',
+    dataIndex: 'billTypeName',
   },
   {
     title: '说明',
@@ -138,15 +139,15 @@ export default defineComponent({
 
 
   setup() {
-    const pagination = {
+    const pagination = ref( {
       onChange: page => {
         console.log("点击的页码为:"+page);
         bill.value.pageNum=page;
         onSearch(page);
       },
       pageSize: 5,
-      total: 100
-    };
+      total: 0
+    });
 
     /**
      * bill 是待查询的数据
@@ -218,12 +219,31 @@ export default defineComponent({
           console.log("查询数据成功");
           console.log("查询出的数据条数为:"+data.content.list.length);
           bills.value=data.content.list;
-          pagination.total=data.content.total;
-          pagination.pageSize=data.content.pageSize;
+          console.log("传来的total值为:"+data.content.total);
+          pagination.value.total=data.content.total;
         } else {
           message.error(data.message);
         }
       })
+    }
+
+    /**
+     * 重置按钮
+     * 清空之前选择的所有查询条件
+     */
+    const reset = () => {
+      /**
+       * id:"",
+       title:"",
+       startDate:"",
+       endDate:"",
+       typeId:0,
+       pageNum:1,
+       pageSize:5
+       */
+      bill.value.startDate="";
+      bill.value.endDate="";
+      bill.value.typeId=0;
     }
 
 
@@ -233,7 +253,7 @@ export default defineComponent({
      */
     onMounted(()=>{
       getTypes();
-      // onSearch();
+      onSearch();
     });
 
     return {
@@ -243,7 +263,8 @@ export default defineComponent({
       types,
       deleteById,
       pagination,
-      onSearch
+      onSearch,
+      reset
     }
   },
 
