@@ -15,13 +15,6 @@
                         @focus="focus"
                         ref="select"
                 >
-                    <!--这个信息，到时候要从数据库中动态获取-->
-                    <!--<a-select-option value="0">全部</a-select-option>-->
-                    <!--<a-select-option value="1">收入</a-select-option>-->
-                    <!--<a-select-option value="2" >支出</a-select-option>-->
-                    <!--<a-select-option value="3">借入</a-select-option>-->
-                    <!--<a-select-option value="4">借出</a-select-option>-->
-                    <!--<a-select-option value="0">&#45;&#45;选择类型&#45;&#45;</a-select-option>-->
                     <a-select-option v-for="type in types" :value="type.id">{{type.name}}</a-select-option>
                 </a-select>
 
